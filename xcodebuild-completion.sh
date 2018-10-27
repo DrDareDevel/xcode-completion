@@ -4,21 +4,32 @@
 
 _xcodebuild ()
 {
-    compopt +o default
     COMPREPLY=()
     local cur="${COMP_WORDS[COMP_CWORD]}"
     local prev="${COMP_WORDS[COMP_CWORD-1]}"
     local two_prev="${COMP_WORDS[COMP_CWORD-2]}"
 
     # Subcommand list
-    local options="-project -target -alltargets -workspace -scheme -destination -destination -configuration -arch -sdk -showsdks -showBuildSettings -showdestinations -showBuildTimingSummary -list -enableAddressSanitizer -enableThreadSanitizer -enableUndefinedBehaviorSanitizer -enableCodeCoverage -testLanguage -testRegion -derivedDataPath -resultBundlePath -allowProvisioningUpdates -allowProvisioningDeviceRegistration -exportArchive -exportNotarizedApp -archivePath -exportPath -exportOptionsPlist -exportLocalizations -importLocalizations -localizationPath -exportLanguage -xcconfig -xctestrun -skip -disable -maximum -maximum -parallel -parallel -maximum -dry -n -skipUnavailableActions buildsetting -userdefault -toolchain -quiet -verbose -version -license -checkFirstLaunchStatus -runFirstLaunch -usage"
+    local options="-project -target -alltargets -workspace -scheme -destination -destination -configuration -arch -sdk -showsdks -showBuildSettings -showdestinations -showBuildTimingSummary -list -enableAddressSanitizer -enableThreadSanitizer -enableUndefinedBehaviorSanitizer -enableCodeCoverage -testLanguage -testRegion -derivedDataPath -resultBundlePath -allowProvisioningUpdates -allowProvisioningDeviceRegistration -exportArchive -exportNotarizedApp -archivePath -exportPath -exportOptionsPlist -exportLocalizations -importLocalizations -localizationPath -exportLanguage -xcconfig -xctestrun -skip -disable -maximum -maximum -parallel -parallel -maximum -dry-run -n -skipUnavailableActions -userdefault= -toolchain -quiet -verbose -version -license -checkFirstLaunchStatus -runFirstLaunch -usage -help"
     local actions="build build-for-testing analyze archive test test-without-building install-src install clean"
     [[ ${COMP_CWORD} -eq 1 ]] && {
-        COMPREPLY=( $(compgen -W "${options} ${actions}" -- ${cur}) )
-        return
+        case "$cur" in
+          -*)
+            COMPREPLY=( $(compgen -W "${options}" -- ${cur}) )
+            return
+            ;;
+          *)
+            COMPREPLY=( $(compgen -W "${actions}" -- ${cur}) )
+            return
+            ;;
+          esac
     }
     if [[ ${COMP_CWORD} -eq 2 ]]; then
         case "$prev" in
+            -parallel-testing-enabled|-enableAddressSanitizer|-enableThreadSanitizer|-enableUndefinedBehaviorSanitizer|-enableCodeCoverage)
+                COMPREPLY=( $(compgen -W "YES NO" -- ${cur}) )
+                return
+                ;;
             print|enable|disable|blame|runstats|bootstrap|bootout|debug)
                 compopt -o nospace
                 if [[ ${cur} == */*/* ]]; then
